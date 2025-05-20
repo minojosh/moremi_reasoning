@@ -1,0 +1,146 @@
+# prompts.yaml
+# Centralized storage of all QRA prompt templates
+
+query_prompt_init: |-
+  <question>
+  {}
+  </question>
+  
+  Please respond to the above question <question> with the attached images using the Chain of Thought (CoT) reasoning method by analysing the case with the images. You should examine all provided images carefully. You should read from the values image if any eg. if they have labels in the image, like Image A or Image B or anything, mention them in your thought. If there are multiple images, treat them as a series and analyze how they relate to each other. Your response should consist of multiple steps, each of which includes three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+  
+  - **'Inner Thinking'**: This is the step where thinking is done. Note that multiple 'Inner Thinking' steps are required to describe thorough reasoning. Each step should first generate a brief title.
+  - **'Final Conclusion'**: At this stage, you summarize the correct reasoning from previous 'Inner Thinking' steps and provide the final answer. No title is required here.
+  - **'Verification'**: At this stage, you verify the conclusion from the "Final Conclusion" step. If the conclusion holds, end the process. If not, return to "Inner Thinking" for further reasoning. No title is required here.
+  Your response should be detailed and thorough, showing all your thinking process.
+
+gen_prompt_rethink_Backtracking: |-
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  <previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Your 'Verification' results must align with mine. Proceed to refine the reasoning using **backtracking** to revisit earlier points of reasoning and construct a new Final Conclusion.
+
+gen_prompt_rethink_Exploring_New_Path: |-
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  <previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Your 'Verification' results must align with mine. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Proceed to refine the reasoning by exploring new approaches to solving this problem and construct a new Final Conclusion.
+
+gen_prompt_rethink_Verification: |-
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  <previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Your 'Verification' results must align with mine. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Proceed to refine the reasoning by verifying each step of your thought process and construct a new Final Conclusion.
+
+gen_prompt_rethink_Correction: |-
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  <previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Your 'Verification' results must align with mine. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Proceed to refine the reasoning by correcting any errors in your thought process and construct a new Final Conclusion.
+# Additional prompts (verify, natural_reasoning, final_response) follow the same pattern
+guided_prompt: |-
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  <previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+verify_prompt: |-
+  <Model Response>
+  {}
+  </Model Response>
+
+  <Reference Answer>
+  {}
+  </Reference Answer>
+
+  Based on the model response and reference answer above, is the model's conclusion correct? 
+  Simply answer "True" if correct, "False" if incorrect dont add anything else.
+
+natural_reasoning_prompt: |-
+  <Thought Process>
+  {}
+  </Thought Process>
+  ... (omit for brevity)
+
+final_response_prompt: |-
+  <Internal Thinking>
+  {}
+  </Internal Thinking>
+
+  <Question>
+  {}
+  </Question>
+
+  The <Internal Thinking> represents your internal thoughts about the <Question>. Based on this, generate a rich and high-quality final response to the user.
+  If the <Question> demands a report, provide it in this structure
+
+  <structure>
+  {"Specimen Information": {"general_description": "General description of the specimen.", "source": "Source of the specimen."}, "Physical Examination": ["Colour", "Appearance"], "Microscopic Examination": ["Detailed microscopic description.", "Cells visible and their counts"], "Final Diagnosis": {"diagnosis": "Final diagnosis based on examination.", "additional_notes": "Additional notes or observations."}}
+  </structure>

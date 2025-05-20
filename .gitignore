@@ -1,0 +1,9 @@
+*.log
+.env
+__pycache__/
+*.pyc
+.vscode/
+chest_xray_reports/
+logs/
+data/
+reports/

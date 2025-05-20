@@ -1,0 +1,15 @@
+# config.yaml
+# Configuration for QRA pipeline
+
+data_path: src/data/medpix_report.json
+model_name: google/gemini-2.5-pro-preview-03-25
+api_url: https://openrouter.ai/api/v1
+max_search_attempts: 1
+max_search_depth: 2
+efficient_search: true
+num_process: 1
+limit_num: null
+image_dir: c:\Users\minom\Pictures\m1\training_images
+reports_prompts_path: src/data/reports prompts.json
+start_index: 0
+batch_size: 100
