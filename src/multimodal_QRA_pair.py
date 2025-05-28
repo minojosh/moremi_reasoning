@@ -5,36 +5,54 @@ from multiprocessing import Pool
 from concurrent.futures import ThreadPoolExecutor
 from openai import OpenAI
 from dotenv import load_dotenv
-import yaml
 import os
 import base64
 import random
 import json
 import re  
 import traceback
+import requests
+from urllib.parse import urlparse
+import yaml
 
 load_dotenv()
 
 # Get the directory of the current script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Load CONFIG from config.yaml (located in the parent directory of 'src')
-CONFIG_PATH = os.path.join(SCRIPT_DIR, "..", "config.yaml")
+# Load CONFIG from reasoning_config.yaml (located in config subdirectory)
+CONFIG_PATH = os.path.join(SCRIPT_DIR, "config", "reasoning_config.yaml")
 if not os.path.exists(CONFIG_PATH):
-    raise FileNotFoundError(f"config.yaml not found. Expected at: {CONFIG_PATH}")
+    raise FileNotFoundError(f"reasoning_config.yaml not found. Expected at: {CONFIG_PATH}")
 with open(CONFIG_PATH, 'r') as f:
     CONFIG = yaml.safe_load(f)
 
-# Load PROMPTS from prompts.yaml (located in the same 'src' directory as the script)
-PROMPTS_PATH = os.path.join(SCRIPT_DIR, "prompts.yaml")
+# Load PROMPTS from reasoning_prompts.yaml (located in config subdirectory)
+PROMPTS_PATH = os.path.join(SCRIPT_DIR, "config", "reasoning_prompts.yaml")
 if not os.path.exists(PROMPTS_PATH):
-    raise FileNotFoundError(f"prompts.yaml not found. Expected at: {PROMPTS_PATH}")
+    raise FileNotFoundError(f"reasoning_prompts.yaml not found. Expected at: {PROMPTS_PATH}")
 with open(PROMPTS_PATH, 'r') as f:
     PROMPTS = yaml.safe_load(f)
 
 def encode_image(image_path):
-    with open(os.path.join(CONFIG["image_dir"], os.path.basename(image_path)), "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode("utf-8")
+    """Encode image from local file or URL to base64"""
+    try:
+        # Check if it's a URL
+        if image_path.startswith(('http://', 'https://')):
+            response = requests.get(image_path, timeout=30)
+            response.raise_for_status()
+            return base64.b64encode(response.content).decode("utf-8")
+        else:
+            # Handle local file
+            if not os.path.isabs(image_path):
+                # If relative path, join with image_dir
+                image_path = os.path.join(CONFIG["image_dir"], os.path.basename(image_path))
+            
+            with open(image_path, "rb") as image_file:
+                return base64.b64encode(image_file.read()).decode("utf-8")
+    except Exception as e:
+        print(f"Error encoding image {image_path}: {str(e)}")
+        raise
 
 class GPT:
     def __init__(self):
@@ -150,12 +168,28 @@ def main():
         filtered_data = []
         process_id = 1
         for case in tmpdata:
-            data_point = {
-                'process_id': process_id,
-                'Open-ended Verifiable Question': case["question"],
-                'Ground-True Answer': case["answer"],
-                'img_urls': case['img_urls']  # Changed from img_url to img_urls
-            }
+            # Handle both old format and new OCR format
+            if isinstance(case, dict):
+                if "question" in case and "answer" in case:
+                    # Old format
+                    data_point = {
+                        'process_id': process_id,
+                        'Open-ended Verifiable Question': case["question"],
+                        'Ground-True Answer': case["answer"],
+                        'img_urls': case.get('img_urls', [])
+                    }
+                elif "Open-ended Verifiable Question" in case:
+                    # New OCR format - already properly structured
+                    data_point = case.copy()
+                    data_point['process_id'] = process_id
+                else:
+                    # Skip malformed data
+                    print(f"Warning: Skipping malformed data entry: {case}")
+                    continue
+            else:
+                print(f"Warning: Skipping non-dict data entry: {case}")
+                continue
+                
             filtered_data.append(data_point)
             process_id += 1
 
@@ -258,7 +292,8 @@ def main():
             # If still incorrect and efficient search enabled, provide the answer
             if not correct and CONFIG["efficient_search"]:
                 attempt_history.append('Guided Prompt')
-                query = PROMPTS['guided_prompt'].format(d['Open-ended Verifiable Question'], best_reasoning[-1] if isinstance(best_reasoning, list) and best_reasoning else "", d['Ground-True Answer'])
+                last_reasoning = reasoning_history[-1] if reasoning_history else ""
+                query = PROMPTS['guided_prompt'].format(d['Open-ended Verifiable Question'], last_reasoning, d['Ground-True Answer'])
                 query_history.append(query)
                 
                 response = gpt_instance.retry_call(query, image_urls=image_urls)
