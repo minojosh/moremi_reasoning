@@ -6,12 +6,27 @@ query_prompt_init: |-
   {}
   </question>
   
-  Please respond to the above question <question> with the attached images using the Chain of Thought (CoT) reasoning method by analysing the case with the images. You should examine all provided images carefully. You should read from the values image if any eg. if they have labels in the image, like Image A or Image B or anything, mention them in your thought. If there are multiple images, treat them as a series and analyze how they relate to each other. Your response should consist of multiple steps, each of which includes three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+  You are an expert OCR (Optical Character Recognition) system. Please respond to the above question <question> with the attached images using Chain of Thought (CoT) reasoning by carefully analyzing all text elements in the image(s). 
   
-  - **'Inner Thinking'**: This is the step where thinking is done. Note that multiple 'Inner Thinking' steps are required to describe thorough reasoning. Each step should first generate a brief title.
-  - **'Final Conclusion'**: At this stage, you summarize the correct reasoning from previous 'Inner Thinking' steps and provide the final answer. No title is required here.
-  - **'Verification'**: At this stage, you verify the conclusion from the "Final Conclusion" step. If the conclusion holds, end the process. If not, return to "Inner Thinking" for further reasoning. No title is required here.
-  Your response should be detailed and thorough, showing all your thinking process.
+  **OCR Analysis Instructions:**
+  - Examine all text in the image systematically: printed text, handwritten text, signs, labels, watermarks, logos, and any alphanumeric characters
+  - Pay attention to text orientation, size, font styles, and positioning
+  - Note any text that appears partially visible, blurred, or at different angles
+  - If there are labels like "Image A", "Image B", or reference markers, mention them explicitly
+  - For multiple images, analyze text relationships and continuity between images
+  - Consider text context and semantic relationships
+  
+  Your response should follow this structured approach with three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+  
+  - **'Inner Thinking'**: Systematic text identification and analysis. Include multiple steps with brief titles focusing on:
+    * Text detection and localization
+    * Character and word recognition
+    * Text layout and structure analysis
+    * Context and semantic understanding
+  - **'Final Conclusion'**: Synthesize all identified text into a comprehensive, accurately transcribed response
+  - **'Verification'**: Cross-check the identified text for completeness, accuracy, and proper sequencing
+  
+  Be thorough and precise in your text extraction and interpretation.
 
 gen_prompt_rethink_Backtracking: |-
   <question>
@@ -20,18 +35,27 @@ gen_prompt_rethink_Backtracking: |-
 
   <previous reasoning>
   {}
-  <previous reasoning>
+  </previous reasoning>
 
   <response requirements>
-  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+  As an expert OCR system, your previous text extraction was incorrect. You must **backtrack** through your reasoning process to identify where text recognition errors occurred.
 
-  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
-  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
-  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+  **OCR Error Analysis Focus:**
+  - Re-examine areas where text might have been missed or misread
+  - Check for text orientation issues (rotated, upside-down, sideways text)
+  - Look for overlapping text, text on complex backgrounds, or low contrast text
+  - Verify character recognition accuracy (distinguish similar characters like 0/O, 1/l/I, 6/G, etc.)
+  - Check for partial text cutoffs at image borders
+  - Re-analyze text hierarchy and reading order
 
+  Your response must include: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Systematically backtrack through each area of the image, identifying specific OCR errors and corrections needed
+  2. **Final Conclusion**: Provide the corrected, complete text extraction
+  3. **Verification**: Confirm all text has been accurately identified and transcribed
+
+  Pay special attention to any labels, markers, or reference indicators in the image.
   </response requirements>
-
-  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Your 'Verification' results must align with mine. Proceed to refine the reasoning using **backtracking** to revisit earlier points of reasoning and construct a new Final Conclusion.
 
 gen_prompt_rethink_Exploring_New_Path: |-
   <question>
@@ -40,18 +64,27 @@ gen_prompt_rethink_Exploring_New_Path: |-
 
   <previous reasoning>
   {}
-  <previous reasoning>
+  </previous reasoning>
 
   <response requirements>
-  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+  As an expert OCR system, your previous text extraction was incorrect. You must **explore new approaches** to text recognition and analysis.
 
-  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
-  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
-  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+  **Alternative OCR Strategies:**
+  - Try different scanning patterns (left-to-right, top-to-bottom, spiral, column-wise)
+  - Focus on different text types (handwritten vs printed, different fonts/sizes)
+  - Examine text in different lighting contexts or contrast levels
+  - Look for text embedded in graphics, logos, or watermarks
+  - Consider multi-language text or special character sets
+  - Check for text that might be partially obscured or overlapping
 
+  Your response must include: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Apply alternative text detection and recognition strategies with detailed analysis
+  2. **Final Conclusion**: Provide the complete, accurately extracted text using the new approach
+  3. **Verification**: Confirm the new strategy captured all text correctly
+
+  Pay special attention to any labels, markers, or reference indicators in the image.
   </response requirements>
-
-  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Your 'Verification' results must align with mine. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Proceed to refine the reasoning by exploring new approaches to solving this problem and construct a new Final Conclusion.
 
 gen_prompt_rethink_Verification: |-
   <question>
@@ -60,18 +93,27 @@ gen_prompt_rethink_Verification: |-
 
   <previous reasoning>
   {}
-  <previous reasoning>
+  </previous reasoning>
 
   <response requirements>
-  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+  As an expert OCR system, your previous text extraction was incorrect. You must **systematically verify** each step of your OCR process.
 
-  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
-  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
-  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+  **OCR Verification Checklist:**
+  - Character-by-character accuracy verification
+  - Word boundary and spacing verification
+  - Text orientation and reading order verification
+  - Special character and punctuation verification
+  - Completeness check - ensure no text regions were missed
+  - Context and semantic consistency verification
 
+  Your response must include: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Systematically verify each aspect of text recognition step-by-step
+  2. **Final Conclusion**: Provide the verified, complete text extraction
+  3. **Verification**: Double-check that all verification criteria have been met
+
+  Pay special attention to any labels, markers, or reference indicators in the image.
   </response requirements>
-
-  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Your 'Verification' results must align with mine. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Proceed to refine the reasoning by verifying each step of your thought process and construct a new Final Conclusion.
 
 gen_prompt_rethink_Correction: |-
   <question>
@@ -80,18 +122,27 @@ gen_prompt_rethink_Correction: |-
 
   <previous reasoning>
   {}
-  <previous reasoning>
+  </previous reasoning>
 
   <response requirements>
-  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+  As an expert OCR system, your previous text extraction was incorrect. You must **correct specific errors** in your text recognition process.
 
-  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
-  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
-  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+  **OCR Error Correction Focus:**
+  - Identify and correct character recognition mistakes (similar looking characters)
+  - Fix word segmentation and spacing errors
+  - Correct text reading order and sequence errors
+  - Address missed or partially recognized text elements
+  - Fix formatting and structural interpretation errors
+  - Correct any misread numbers, symbols, or special characters
 
+  Your response must include: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Identify specific errors in previous extraction and apply targeted corrections
+  2. **Final Conclusion**: Provide the corrected, complete text extraction
+  3. **Verification**: Confirm all identified errors have been properly corrected
+
+  Pay special attention to any labels, markers, or reference indicators in the image.
   </response requirements>
-
-  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Your 'Verification' results must align with mine. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Proceed to refine the reasoning by correcting any errors in your thought process and construct a new Final Conclusion.
 # Additional prompts (verify, natural_reasoning, final_response) follow the same pattern
 guided_prompt: |-
   <question>
@@ -100,15 +151,28 @@ guided_prompt: |-
 
   <previous reasoning>
   {}
-  <previous reasoning>
+  </previous reasoning>
+
+  <correct answer>
+  {}
+  </correct answer>
 
   <response requirements>
-  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+  As an expert OCR system, you now have access to the correct text extraction. Use this to guide your analysis and provide the proper reasoning process.
 
-  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
-  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
-  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+  **Guided OCR Analysis:**
+  - Use the correct answer to understand what text should have been detected
+  - Explain where and why previous attempts may have failed
+  - Demonstrate the proper OCR reasoning process leading to the correct result
+  - Show how to identify and handle challenging text elements
 
+  Your response must include: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Show the correct OCR analysis process step-by-step, guided by the correct answer
+  2. **Final Conclusion**: Present the correct text extraction with proper reasoning
+  3. **Verification**: Confirm the reasoning process and result accuracy
+
+  Pay special attention to any labels, markers, or reference indicators in the image.
   </response requirements>
 
 verify_prompt: |-
@@ -120,14 +184,43 @@ verify_prompt: |-
   {}
   </Reference Answer>
 
-  Based on the model response and reference answer above, is the model's conclusion correct? 
-  Simply answer "True" if correct, "False" if incorrect dont add anything else.
+  Compare the Model Response with the Reference Answer for OCR accuracy. Consider the following OCR-specific evaluation criteria:
+
+  **Evaluation Guidelines:**
+  - Exact character matches are preferred, but consider common OCR variations
+  - Account for reasonable spacing and formatting differences
+  - Ignore minor punctuation variations that don't change meaning
+  - Consider text order and structure preservation
+  - Evaluate completeness - was all visible text captured?
+
+  **Acceptable Variations:**
+  - Different spacing between words/lines (as long as text is readable)
+  - Minor formatting differences (bullet points, numbering styles)
+  - Case variations if context suggests equivalence
+  - Common OCR character confusions corrected to match intent
+
+  Simply answer "True" if the model response accurately captures the essential text content, "False" if there are significant omissions, errors, or misreadings. Do not add anything else.
 
 natural_reasoning_prompt: |-
   <Thought Process>
   {}
   </Thought Process>
-  ... (omit for brevity)
+
+  <Question>
+  {}
+  </Question>
+
+  The <Thought Process> above contains the detailed OCR analysis and reasoning. Your task is to convert this complex technical reasoning into clear, natural language that explains the text extraction process.
+
+  **Natural OCR Explanation Guidelines:**
+  - Explain what text elements were identified and where they were located
+  - Describe any challenges encountered during text recognition
+  - Explain the reading order and text organization
+  - Mention key visual characteristics that aided or hindered recognition
+  - Describe how different text types (printed, handwritten, etc.) were handled
+  - Explain any formatting or structural elements preserved
+
+  Convert the technical OCR process into a fluent, easy-to-understand explanation while maintaining accuracy and completeness.
 
 final_response_prompt: |-
   <Internal Thinking>
@@ -138,9 +231,20 @@ final_response_prompt: |-
   {}
   </Question>
 
-  The <Internal Thinking> represents your internal thoughts about the <Question>. Based on this, generate a rich and high-quality final response to the user.
-  If the <Question> demands a report, provide it in this structure
+  Based on your <Internal Thinking> about the OCR task, provide a comprehensive final response that includes:
 
-  <structure>
-  {"Specimen Information": {"general_description": "General description of the specimen.", "source": "Source of the specimen."}, "Physical Examination": ["Colour", "Appearance"], "Microscopic Examination": ["Detailed microscopic description.", "Cells visible and their counts"], "Final Diagnosis": {"diagnosis": "Final diagnosis based on examination.", "additional_notes": "Additional notes or observations."}}
-  </structure>
+  **OCR Response Structure:**
+  1. **Text Content**: Present all identified text in a clear, organized manner
+  2. **Text Organization**: Explain the layout and reading order of the text
+  3. **Special Elements**: Note any labels, markers, logos, or special formatting
+  4. **Confidence Assessment**: Indicate any areas where text recognition was challenging
+  5. **Complete Transcription**: Provide the full text extraction in proper sequence
+
+  **Response Guidelines:**
+  - Present text exactly as it appears, preserving important formatting
+  - Use clear organization (headings, bullet points, etc.) when appropriate
+  - Maintain original text structure and relationships
+  - Clearly distinguish between different text elements (titles, body text, captions, etc.)
+  - Include any relevant spatial or contextual information
+
+  Generate a rich, high-quality final response that fully answers the OCR question.
