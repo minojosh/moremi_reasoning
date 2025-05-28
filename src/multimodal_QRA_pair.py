@@ -5,6 +5,7 @@ from multiprocessing import Pool
 from concurrent.futures import ThreadPoolExecutor
 from openai import OpenAI
 from dotenv import load_dotenv
+from kaggle_secrets import UserSecretsClient
 import os
 import base64
 import random
@@ -16,6 +17,7 @@ from urllib.parse import urlparse
 import yaml
 
 load_dotenv()
+user_secrets = UserSecretsClient()
 
 # Get the directory of the current script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -58,7 +60,7 @@ class GPT:
     def __init__(self):
         self.model_name = CONFIG["model_name"]
         self.api_url = CONFIG["api_url"]
-        self.api_key = os.getenv("API_KEY")
+        self.api_key = user_secrets.get_secret("OPEN_ROUTER_API_KEY") or os.getenv("OPEN_ROUTER_API_KEY")
         return
 
     def call(self, content, additional_args={}, image_urls=None, url=None, model=None):
