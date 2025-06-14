@@ -28,8 +28,8 @@ class ReasoningConfig:
             config_dir = script_dir / "config"
         
         self.config_dir = Path(config_dir)
-        self.config_file = config_file or "reasoning_config.yaml"
-        self.prompts_file = prompts_file or "handwriting_prompts.yaml"
+        self.config_file = config_file or "salesforce_config.yaml"
+        self.prompts_file = prompts_file or "salesforce_prompts.yaml"
         self._load_configs()
     
     def _load_configs(self):
