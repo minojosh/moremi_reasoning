@@ -7,3 +7,11 @@ chest_xray_reports/
 logs/
 data/
 reports/
+legacy/
+old/
+tests/
+*.json
+minoenv/*
+mcp_servers/*
+minoenv/bin/activate
+setup_mcp_servers.sh
