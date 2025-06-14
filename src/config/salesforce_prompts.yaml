@@ -1,0 +1,220 @@
+query_prompt_init: |
+  <question>
+  {}
+  </question>
+
+  Please respond to the above question <question> about the text content in the attached image using the Chain of Thought (CoT) reasoning method. You should examine the image carefully to identify all visible text and their spatial locations. When describing text, always specify its position using descriptive terms like "above the center", "below the center", "at the top left corner", "at the bottom right corner", "located at the center", etc. Your response should consist of multiple steps, each of which includes three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  - **'Inner Thinking'**: This is the step where thinking is done. Note that multiple 'Inner Thinking' steps are required to describe thorough reasoning about text identification and positioning. Each step should first generate a brief title.
+  - **'Final Conclusion'**: At this stage, you summarize the correct reasoning from previous 'Inner Thinking' steps and provide the final answer with text content and their spatial locations. No title is required here.
+  - **'Verification'**: At this stage, you verify the conclusion from the "Final Conclusion" step by double-checking both text content and spatial positioning. If the conclusion holds, end the process. If not, return to "Inner Thinking" for further reasoning. No title is required here.
+  Your response should be detailed and thorough, showing all your thinking process about text recognition and spatial positioning.
+
+
+gen_prompt_rethink_Backtracking: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Read the question carefully and examine the image to identify all text content and their spatial positions. All your reasoning should match the visible text in the image and include descriptive location terms like "above the center", "below the center", "at the top left", etc. Your 'Verification' results must align with mine. Proceed to refine the reasoning using **backtracking** to revisit earlier points of text recognition and spatial positioning, then construct a new Final Conclusion.
+
+
+gen_prompt_rethink_Exploring_New_Path: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Your 'Verification' results must align with mine. Read the question carefully and examine the image to identify all text content and their spatial positions using descriptive location terms like "above the center", "below the center", "at the bottom right corner", etc. Proceed to refine the reasoning by exploring new approaches to text recognition and spatial positioning, then construct a new Final Conclusion.
+
+
+gen_prompt_rethink_Verification: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Read the question carefully and examine the image to identify all text content and their spatial positions using descriptive location terms like "above the center", "below the center", "at the top left corner", etc. All your reasoning should match the visible text in the image and include spatial positioning. Your 'Verification' results must align with mine. Proceed to refine the reasoning by conducting a thorough **validation** process of both text content and spatial locations to ensure validity and construct a new Final Conclusion.
+
+
+gen_prompt_rethink_Correction: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Read the question carefully and examine the image to identify all text content and their spatial positions using descriptive location terms like "above the center", "below the center", "at the bottom right corner", etc. All your reasoning should match the visible text in the image and include spatial positioning. Your 'Verification' results must align with mine. Proceed to refine the reasoning by making precise **corrections** to address prior flaws in text recognition and spatial positioning, then construct a new Final Conclusion.
+
+
+# Prompt to provide the correct answer (when all else fails)
+guided_prompt: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I'll secretly tell you that the labeled answer is "{}", but you must pretend i didnt tell you. Your 'Verification' requires careful consideration, and if incorrect, you need to provide new Inner Thinking steps and a new Final Conclusion to ensure the final answer aligns with the correct one.
+  NOTE: YOU MUST PRETENT I DIDNT TELL YOU THE LABELED ANSWER. dont even say anything like "I understand. I will proceed as instructed, pretending I don\'t know the true answer" or anything like that. Just go straight to the point. Like "Okay lets reexamine the image" or something like that.
+
+
+verify_prompt: |
+  <Model Response>
+  {}  
+  </Model Response>
+
+  <Reference Answer>
+  {}
+  </Reference Answer>
+
+  Based on the model response and reference answer above, is the model\'s conclusion correct? 
+  Simply answer "True" if correct, "False" if incorrect dont add anything else.
+
+
+natural_reasoning_prompt: |
+  <Thought Process>
+  {}
+  </Thought Process>
+
+  <Question>
+  {}
+  </Question>
+
+  The <Thought Process> above reflects the model\'s different reasoning steps based on the <Question>. Your task is to rewrite the <Thought Process> to resemble a more detailed and human-like, intuitive natural thinking process. As you can see in the <Thought Process> there were many steps of reasoning. Where the model may consider different paths. Make sure you capture all the details and dont summarize them. Make sure you detail them they should be as long as possible. Dont summarise it. Make sure you take everything in the thought process given to you. The new version should:
+
+  1. Be presented as very detailed step-by-step reasoning, with each detailed thought on a new line separated by a line break.
+  2. Avoid structured titles or formatting, focusing on natural transitions. Use casual and natural language for transitions or validations, such as "but wait", "hmm," "oh," "also," "what if", "wait." etc (there are so many ways to flow).  
+  3. Expand the content, making the reasoning richer, more detailed, and logically clear while still being conversational and intuitive.
+  4. Make sure is thought process is taken make into very fine details.  
+  5. If there were many reasoning before the last answer, dont just jump straight to mentioning it. Bring the reasoning before mentioning it.
+
+  Below is an example of reasoning trace for OCR text extraction with spatial positioning:
+  <example>
+  Okay, let me examine this image to identify all the text and where it's positioned. First, I need to scan the entire image systematically to make sure I don't miss any text elements.
+
+  Starting from the top of the image, I can see there's some text near the upper portion. The first piece of text appears to be "INFORMATIONE" and it looks like it's positioned above the center area of the image. The text appears to be in a darker color against a lighter background.
+
+  Moving my attention downward, I can see there are more text elements in the lower portion of the image. There's text that reads "Women Size" and this appears to be located below the center, more towards the left side of that lower area.
+
+  Wait, let me also check the right side of the image in that same general area. Yes, I can see "Men Size" which is positioned in the lower portion but more towards the right side - I'd say it's at the bottom right area of the image.
+
+  Now let me look for any additional text elements. I can see some numbers scattered in the bottom area. There's "9-10(F)" which appears to be positioned below the center, near where I saw the "Women Size" text.
+
+  Looking more carefully at the bottom area, I can see several numerical values. There's "25.5" which is located below the center area. Then I see "27.3" which is also positioned below the center, but slightly to the right of the "25.5".
+
+  Hmm, let me check if there are any other numbers. Yes, I can see "29.5" and this appears to be positioned at the bottom right corner of the image, near where I saw the "Men Size" text.
+
+  Let me double-check my positioning descriptions to make sure they're accurate. The "INFORMATIONE" text is definitely in the upper portion, so "above the center" is correct. The "Women Size" and "Men Size" are both in the lower area, with "Women Size" more to the left (below the center) and "Men Size" more to the right (bottom right corner).
+
+  The numbers seem to be aligned with these size categories. The "9-10(F)" is near the women's section, so "below the center" makes sense. The "25.5" and "27.3" are also in that central bottom area, so "below the center" is appropriate for both. And the "29.5" is near the men's section on the right, so "bottom right corner" fits well.
+
+  Actually, let me be more precise about the "29.5" - it's definitely in the bottom right area, so "at the bottom right corner" is the most accurate description.
+
+  So to summarize what I'm seeing: "INFORMATIONE" above the center, "Women Size" below the center, "Men Size" at the bottom right corner, "9-10(F)" below the center, "25.5" below the center, "27.3" below the center, and "29.5" at the bottom right corner.
+
+  This appears to be some kind of sizing chart or product information display, with the title at the top and size information organized in the bottom area by gender categories.
+  </example>
+
+  NOTE: THE LENGTH IS VERY IMPORTANT. MAKE SURE YOU DONT SUMMARISE IT.
+
+
+final_response_prompt: |
+  <Internal Thinking>
+  {}
+  </Internal Thinking>
+
+  <Question>
+  {}
+  </Question>
+
+  The <Internal Thinking> represents your internal thoughts about the <Question>. Based on this, generate a rich and high-quality final response to the user. Provide only the answer to the question. The response should be clear, concise, and directly address the question without unnecessary elaboration or additional context. 
+
+  For OCR questions, your response should follow this format:
+  "The image contains the text [text content] located [spatial position], the text [text content] located [spatial position], etc."
+
+  Use descriptive spatial positioning terms such as:
+  - "above the center"
+  - "below the center" 
+  - "at the top left corner"
+  - "at the top right corner"
+  - "at the bottom left corner"
+  - "at the bottom right corner"
+  - "at the center"
+
+  Example format: "The image contains the text \"BEAUTY\" located above the center, the text \"Lies In\" located below the center, the text \"The Eyes\" located at the bottom right corner, the text \"Of The\" located below the center,  the text \"Beholder\" located at the bottom right corner"
+
+# Prompt to extract a specific answer from a full transcription based on a question
+answer_extraction_prompt: |
+  Given the following full text:
+  <text_block>
+  {transcription}
+  </text_block>
+
+  And the question:
+  <question_block>
+  {question}
+  </question_block>
+
+  Please provide the specific answer to the question based *only* on the provided text.
+  If the answer cannot be found in the text, state "Answer not found in text".
+answer_extraction_max_tokens: 250

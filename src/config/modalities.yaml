@@ -3,3 +3,46 @@ modalities:
     keywords:
       - mammography
       - mammogram
+      - digital mammography
+      - screening mammography
+  x-ray:
+    keywords:
+      - chest x-ray
+      - plain x-ray
+      - radiograph
+      - spine x-ray
+      - limb x-ray
+  ultrasound:
+    keywords:
+      - ultrasound
+      - ultrasonography
+      - echo
+      - echography
+      - Doppler ultrasound
+  ct:
+    keywords:
+      - ct
+      - CT scan
+      - computed tomography
+      - contrast CT
+      - volumetric CT
+  pathology:
+    keywords:
+      - pathology
+      - histopathology
+      - biopsy analysis
+      - tissue pathology
+  mri:
+    keywords:
+      - mri
+      - MRI scan
+      - magnetic resonance imaging
+      - MR imaging
+      - contrast MRI
+  angiography:
+    keywords:
+      - angiography
+      - angio
+      - CT angiography
+      - MR angiography
+      - vascular imaging

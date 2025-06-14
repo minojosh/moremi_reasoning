@@ -1,0 +1,34 @@
+# Salesforce OCR QA Reasoning Pipeline Configuration
+# Focused on question-answering with OCR data
+
+# Data paths (relative to project root)
+images_dir: "src/data/salesforce/salesforce_images"
+results_dir: "src/data/salesforce/reasoning_samples"
+json_dir: "src/data/salesforce/qa_pairs"
+
+# API Configuration
+model_name: "google/gemini-2.0-flash-001"
+api_url: "https://openrouter.ai/api/v1"
+
+# Processing Configuration
+start_index: 0  # Start index for processing QA pairs
+max_search_attempts: 3  # Maximum reasoning strategy attempts
+max_search_depth: 2  # Maximum depth for reasoning strategies
+efficient_search: true  # Use efficient reasoning strategies
+num_processes: 2  # Number of parallel processes
+batch_size: 20  # Batch size for processing
+limit_num: null  # null for all QA pairs, or set a number for testing
+
+# QA Processing Settings
+granularity: 1  # Default granularity level (1 = word-based locations)
+calculate_metrics: true
+save_detailed_results: true
+include_error_analysis: true
+
+# Prompt Configuration
+max_tokens: 1500
+final_response_max_tokens: 1000
+
+# Output Configuration
+output_dir: "src/data/salesforce/reasoning_samples"
+logs_dir: "logs/salesforce"

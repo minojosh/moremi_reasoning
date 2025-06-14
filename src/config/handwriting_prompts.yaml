@@ -1,0 +1,246 @@
+query_prompt_init: |
+  <question>
+  {}
+  </question>
+
+  Please respond to the above question <question> with the attached images using the Chain of Thought (CoT) reasoning method by analysing the case with the images. You should examine all provided images carefully. You should read from the values image if any eg. if they have labels in the image, like Image A or Image B or anything, mention them in your thought. If there are multiple images, treat them as a series and analyze how they relate to each other. Your response should consist of multiple steps, each of which includes three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  - **'Inner Thinking'**: This is the step where thinking is done. Note that multiple 'Inner Thinking' steps are required to describe thorough reasoning. Each step should first generate a brief title.
+  - **'Final Conclusion'**: At this stage, you summarize the correct reasoning from previous 'Inner Thinking' steps and provide the final answer. No title is required here.
+  - **'Verification'**: At this stage, you verify the conclusion from the "Final Conclusion" step. If the conclusion holds, end the process. If not, return to "Inner Thinking" for further reasoning. No title is required here.
+  Your response should be detailed and thorough, showing all your thinking process.
+
+
+gen_prompt_rethink_Backtracking: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Your 'Verification' results must align with mine. Proceed to refine the reasoning using **backtracking** to revisit earlier points of reasoning and construct a new Final Conclusion.
+
+
+gen_prompt_rethink_Exploring_New_Path: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Your 'Verification' results must align with mine. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Proceed to refine the reasoning by exploring new approaches to solving this problem and construct a new Final Conclusion.
+
+
+gen_prompt_rethink_Verification: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Your 'Verification' results must align with mine. Proceed to refine the reasoning by conducting a thorough **validation** process to ensure validity and construct a new Final Conclusion.
+
+
+gen_prompt_rethink_Correction: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Read question well and take good note of the image provided. All your reasoning should match the image. If there are letters or number showing labels eg A or B or anything, mention them in your thought. Your 'Verification' results must align with mine. Proceed to refine the reasoning by making precise **corrections** to address prior flaws and construct a new Final Conclusion.
+
+
+# Prompt to provide the correct answer (when all else fails)
+guided_prompt: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final answer. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I'll secretly tell you that the labeled answer is "{}", but you must pretend i didnt tell you. Your 'Verification' requires careful consideration, and if incorrect, you need to provide new Inner Thinking steps and a new Final Conclusion to ensure the final answer aligns with the correct one.
+  NOTE: YOU MUST PRETENT I DIDNT TELL YOU THE LABELED ANSWER. dont even say anything like "I understand. I will proceed as instructed, pretending I don\'t know the true answer" or anything like that. Just go straight to the point. Like "Okay lets reexamine the image" or something like that.
+
+
+verify_prompt: |
+  <Model Response>
+  {}  
+  </Model Response>
+
+  <Reference Answer>
+  {}
+  </Reference Answer>
+
+  Based on the model response and reference answer above, is the model\'s conclusion correct? 
+  Simply answer "True" if correct, "False" if incorrect dont add anything else.
+
+
+natural_reasoning_prompt: |
+  <Thought Process>
+  {}
+  </Thought Process>
+
+  <Question>
+  {}
+  </Question>
+
+  The <Thought Process> above reflects the model\'s different reasoning steps based on the <Question>. Your task is to rewrite the <Thought Process> to resemble a more detailed and human-like, intuitive natural thinking process. As you can see in the <Thought Process> there were many steps of reasoning. Where the model may consider different paths. Make sure you capture all the details and dont summarize them. Make sure you detail them they should be as long as possible. Dont summarise it. Make sure you take everything in the thought process given to you. The new version should:
+
+  1. Be presented as very detailed step-by-step reasoning, with each detailed thought on a new line separated by a line break.
+  2. Avoid structured titles or formatting, focusing on natural transitions. Use casual and natural language for transitions or validations, such as "but wait", "hmm," "oh," "also," "what if", "wait." etc (there are so many ways to flow).  
+  3. Expand the content, making the reasoning richer, more detailed, and logically clear while still being conversational and intuitive.
+  4. Make sure is thought process is taken make into very fine details.  
+  5. If there were many reasoning before the last answer, dont just jump straight to mentioning it. Bring the reasoning before mentioning it.
+
+  Below is an example of reasoning trace for handwritten OCR transcription:
+  <example>
+  Okay, let\'s try to transcribe this handwritten note. First, I need to get a general sense of the handwriting style. Is it cursive, print, or a mix? The lines look somewhat connected, so it seems to be mostly cursive.
+
+  Looking at the first word on the first line. The first letter is tall with a loop at the top... could be an 'L' or a 'T' if the crossbar is faint or stylized. Let\'s assume 'T' for now. The next letter is small and round, likely an 'o'. Then a small letter with a descender... 'g'? 'y'? 'p'? It looks like it loops back, so maybe 'g'. So, "Tog..."? That doesn\'t immediately make sense.
+
+  Hmm, let me re-examine that first letter. If it's cursive, a capital 'T' often has a distinct top bar. This one is more of a continuous stroke. What if it's an 'S'? An 'S' can be tall. If it's 'S', then 'So...'. The next letter is still 'o'. The one after, if it's 'g', then "Sog..." still not quite right.
+
+  Wait, let me look at the overall shape of that third letter again. It's a bit messy. Could it be an 'm'? If it's an 'm', then "Som...". That seems more plausible. The next letter is small and round, could be an 'e'. "Some". Yes, that looks right!
+
+  Now for the second word. It starts with a letter that looks like 't'. Then a small, round letter, 'h'. Oh, wait, that's not 'h', it's too short. It's probably an 'i'. Then an 'n' and a 'g'. "thing". So, "Something". That makes perfect sense as a starting phrase.
+
+  Let's move to the next line. The first word is short. Looks like "is". Easy enough.
+  The word after "is"... starts with a letter that could be 'h'. Then 'a', then 'p', 'p', 'e', 'n', 'i', 'n', 'g'. "happening".
+  So far: "Something is happening".
+
+  Let me check the context of the entire note if possible. Are there any recurring letter shapes that can help me calibrate? For example, how does this writer make their 'a's or 'e's consistently?
+  I see another 'a' later on, and it has a similar open-top shape. Good. The 'e's are small loops. Consistent.
+
+  What about ambiguous parts? Sometimes a 'u' can look like a 'v' or two 'i's. Or an 'n' like an 'r'.
+  I need to be careful with letters that are close in shape, especially in cursive.
+  Let's look at the third line. "The...". Okay, 'T', 'h', 'e'.
+  Next word: "q", "u", "i", "c", "k". "quick".
+  "brown". "fox".
+  "jumps". "over". "the". "lazy". "dog".
+  Ah, it's the classic pangram! This helps confirm some of the letter interpretations because the words are known.
+
+  But wait, what if it wasn't a pangram? I'd have to rely more on individual letter shapes and common word patterns.
+  For instance, if I saw a shape that could be 'cl' or 'd'. I'd consider which makes more sense in the word. "clog" vs "dog".
+  Also, the spacing between letters and words is important. Sometimes letters can be squished together or words run into each other. I need to segment them properly.
+
+  Let me double-check my transcription of "Something is happening".
+  'S' - yes, tall, slightly curved.
+  'o' - small circle.
+  'm' - two humps, looks okay.
+  'e' - small loop.
+  't' - tall with a crossbar (though a bit faint here).
+  'h' - tall with a hump.
+  'i' - dot is clear.
+  'n' - one hump.
+  'g' - loop below the line.
+  Yes, "Something" seems correct.
+  "is" - 'i' and 's' are clear.
+  "happening" - 'h', 'a', 'p', 'p', 'e', 'n', 'i', 'n', 'g'. All seem to fit the shapes.
+
+  The process involves a lot of hypothesis testing for each letter and word, using knowledge of letterforms, common words, and context. If one interpretation doesn't make sense, I backtrack and try another.
+  The quality of the image is also a factor. If it's blurry or low contrast, it's much harder. This one seems reasonably clear.
+  Okay, I think I have a good grasp of how to approach this. The key is careful observation, iterative refinement, and using contextual clues.
+  </example>
+
+  NOTE: THE LENGTH IS VERY IMPORTANT. MAKE SURE YOU DONT SUMMARISE IT.
+
+
+final_response_prompt: |
+  <Internal Thinking>
+  {}
+  </Internal Thinking>
+
+  <Question>
+  {}
+  </Question>
+
+  The <Internal Thinking> represents your internal thoughts about the <Question>. Based on this, generate a rich and high-quality final response to the user. Provide only the answer to the question. The response should be clear, concise, and directly address the question without unnecessary elaboration or additional context. eg: 'Here is the deciphered handwritten text:' is not necessary
+  If the <Question> demands a report, provide it in this structure:
+
+  structure:
+    Specimen Information:
+      general_description: "General description of the specimen."
+      source: "Source of the specimen."
+    Physical Examination:
+      - "Colour"
+      - "Appearance"
+    Microscopic Examination:
+      - "Detailed microscopic description."
+      - "Cells visible and their counts"
+    Final Diagnosis:
+      diagnosis: "Final diagnosis based on examination."
+      additional_notes: "Additional notes or observations."
+
+  </structure>
+
+# Prompt to extract a specific answer from a full transcription based on a question
+answer_extraction_prompt: |
+  Given the following full text:
+  <text_block>
+  {transcription}
+  </text_block>
+
+  And the question:
+  <question_block>
+  {question}
+  </question_block>
+
+  Please provide the specific answer to the question based *only* on the provided text.
+  If the answer cannot be found in the text, state "Answer not found in text".
+answer_extraction_max_tokens: 250

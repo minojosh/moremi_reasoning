@@ -1,0 +1,35 @@
+# Reasoning Engine Settings
+# Central configuration for all reasoning-based applications
+# Update paths here once and all apps will use them
+
+# Core reasoning configuration
+reasoning_config_file: "reasoning_config.yaml"
+prompts_file: "reasoning_prompts.yaml"
+
+# Application-specific configs
+handwriting_config: "handwriting_config.yaml"
+multimodal_qra_config: "settings.yaml"
+
+# Data directories (relative to project root)
+data_dirs:
+  handwriting:
+    images: "src/data/i_am_handwriting/cropped_handwritten"
+    xml: "src/data/i_am_handwriting/xml"
+    results: "src/data/i_am_handwriting/reasoning_samples"
+  
+  multimodal_qra:
+    reports: "src/reports"
+    data: "src/data"
+    results: "src/logs"
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  directory: "src/logs"
+
+# Runtime settings
+runtime:
+  max_workers: 4
+  default_limit: 10
+  timeout_seconds: 300

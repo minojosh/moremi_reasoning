@@ -1,15 +1,19 @@
-# config.yaml
-# Configuration for OCR QRA pipeline
+# Reasoning Configuration for Handwriting OCR
+# Configuration for handwriting OCR pipeline
 
-data_path: src/data/salesforce_ocr.json
-model_name: google/gemini-2.0-flash-001
-api_url: https://openrouter.ai/api/v1
+model_name: "google/gemini-2.0-flash-001"
+api_url: "https://openrouter.ai/api/v1"
+images_dir: "src/data/salesforce/salesforce_images"
+xml_dir: "src/data/salesforce/xml"
 max_search_attempts: 3
 max_search_depth: 2
 efficient_search: true
-num_process: 2
+num_processes: 2
+batch_size: 20
 limit_num: null
-image_dir: salesforce_images
-reports_prompts_path: src/data/reports prompts.json
 start_index: 0
-batch_size: 50
+calculate_metrics: true
+save_detailed_results: true
+include_error_analysis: true
+results_dir: "results"
+logs_dir: "logs"

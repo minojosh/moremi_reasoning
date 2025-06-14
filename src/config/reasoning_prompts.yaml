@@ -5,9 +5,9 @@ query_prompt_init: |-
   <question>
   {}
   </question>
-  
-  You are an expert OCR (Optical Character Recognition) system. Please respond to the above question <question> with the attached images using Chain of Thought (CoT) reasoning by carefully analyzing all text elements in the image(s). 
-  
+
+  You are an expert OCR (Optical Character Recognition) system. Please respond to the above question <question> with the attached images using Chain of Thought (CoT) reasoning by carefully analyzing all text elements in the image(s).
+
   **OCR Analysis Instructions:**
   - Examine all text in the image systematically: printed text, handwritten text, signs, labels, watermarks, logos, and any alphanumeric characters
   - Pay attention to text orientation, size, font styles, and positioning
@@ -15,17 +15,16 @@ query_prompt_init: |-
   - If there are labels like "Image A", "Image B", or reference markers, mention them explicitly
   - For multiple images, analyze text relationships and continuity between images
   - Consider text context and semantic relationships
-  
+
   Your response should follow this structured approach with three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
-  
-  - **'Inner Thinking'**: Systematic text identification and analysis. Include multiple steps with brief titles focusing on:
-    * Text detection and localization
-    * Character and word recognition
-    * Text layout and structure analysis
-    * Context and semantic understanding
+
+  - **'Inner Thinking'**: Systematic text identification and analysis. Include multiple steps with natural language reasoning to explain how you arrived at your conclusions line by line. Follow this format without showing them as headings or labels:
+    - **Step 1**: Describe the first text element identified, its location, and any relevant characteristics
+    - **Step 3**: Continue this process for all text elements in the image(s)
+
   - **'Final Conclusion'**: Synthesize all identified text into a comprehensive, accurately transcribed response
   - **'Verification'**: Cross-check the identified text for completeness, accuracy, and proper sequencing
-  
+
   Be thorough and precise in your text extraction and interpretation.
 
 gen_prompt_rethink_Backtracking: |-
@@ -96,21 +95,20 @@ gen_prompt_rethink_Verification: |-
   </previous reasoning>
 
   <response requirements>
-  As an expert OCR system, your previous text extraction was incorrect. You must **systematically verify** each step of your OCR process.
+  As an expert OCR system, your previous text extraction was incorrect. You must perform a thorough **validation** of your analysis.
 
-  **OCR Verification Checklist:**
-  - Character-by-character accuracy verification
-  - Word boundary and spacing verification
-  - Text orientation and reading order verification
-  - Special character and punctuation verification
-  - Completeness check - ensure no text regions were missed
-  - Context and semantic consistency verification
+  **OCR Validation Checklist:**
+  - Double-check every character and word against the source image
+  - Confirm correct reading order, especially for complex layouts
+  - Ensure all text segments, including small print or annotations, are captured
+  - Verify that no text has been hallucinated or misinterpreted
+  - Cross-reference with any known context or expected text patterns if available
 
   Your response must include: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
 
-  1. **Inner Thinking**: Systematically verify each aspect of text recognition step-by-step
-  2. **Final Conclusion**: Provide the verified, complete text extraction
-  3. **Verification**: Double-check that all verification criteria have been met
+  1. **Inner Thinking**: Detail the validation process for each part of the extracted text, noting any discrepancies or confirmations.
+  2. **Final Conclusion**: Provide the validated and confirmed text extraction.
+  3. **Verification**: State whether the validation confirms the accuracy of the final text.
 
   Pay special attention to any labels, markers, or reference indicators in the image.
   </response requirements>
@@ -125,25 +123,23 @@ gen_prompt_rethink_Correction: |-
   </previous reasoning>
 
   <response requirements>
-  As an expert OCR system, your previous text extraction was incorrect. You must **correct specific errors** in your text recognition process.
+  As an expert OCR system, your previous text extraction contained errors. You must make precise **corrections** to your analysis.
 
-  **OCR Error Correction Focus:**
-  - Identify and correct character recognition mistakes (similar looking characters)
-  - Fix word segmentation and spacing errors
-  - Correct text reading order and sequence errors
-  - Address missed or partially recognized text elements
-  - Fix formatting and structural interpretation errors
-  - Correct any misread numbers, symbols, or special characters
+  **OCR Correction Steps:**
+  - Pinpoint the exact locations of misread characters, words, or missed text.
+  - Analyze the cause of each error (e.g., blurriness, unusual font, complex background).
+  - Apply targeted correction techniques (e.g., character segmentation, noise reduction focus, font matching).
+  - Re-transcribe the corrected segments accurately.
 
   Your response must include: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
 
-  1. **Inner Thinking**: Identify specific errors in previous extraction and apply targeted corrections
-  2. **Final Conclusion**: Provide the corrected, complete text extraction
-  3. **Verification**: Confirm all identified errors have been properly corrected
+  1. **Inner Thinking**: Describe each identified error, the reason for it, and the specific correction applied.
+  2. **Final Conclusion**: Provide the fully corrected text extraction.
+  3. **Verification**: Confirm that all identified errors have been resolved and the text is now accurate.
 
   Pay special attention to any labels, markers, or reference indicators in the image.
   </response requirements>
-# Additional prompts (verify, natural_reasoning, final_response) follow the same pattern
+
 guided_prompt: |-
   <question>
   {}
@@ -153,26 +149,24 @@ guided_prompt: |-
   {}
   </previous reasoning>
 
-  <correct answer>
-  {}
-  </correct answer>
-
   <response requirements>
-  As an expert OCR system, you now have access to the correct text extraction. Use this to guide your analysis and provide the proper reasoning process.
+  As an expert OCR system, your previous attempts to extract the text were not fully accurate. I will now provide you with the ground truth answer to guide your reasoning. Your task is to align your analysis with this correct answer, pretending you derived it independently.
 
-  **Guided OCR Analysis:**
-  - Use the correct answer to understand what text should have been detected
-  - Explain where and why previous attempts may have failed
-  - Demonstrate the proper OCR reasoning process leading to the correct result
-  - Show how to identify and handle challenging text elements
+  **Ground Truth Answer:** "{}"
+
+  **Instructions:**
+  - Re-examine the image with the ground truth in mind.
+  - Construct a plausible step-by-step "Inner Thinking" process that logically leads to this ground truth.
+  - Ensure your reasoning convincingly explains how each part of the ground truth text is identified from the image.
+  - **Do NOT explicitly state that you were given the answer.** Maintain the persona of an OCR system arriving at the conclusion through its own analysis.
 
   Your response must include: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
 
-  1. **Inner Thinking**: Show the correct OCR analysis process step-by-step, guided by the correct answer
-  2. **Final Conclusion**: Present the correct text extraction with proper reasoning
-  3. **Verification**: Confirm the reasoning process and result accuracy
+  1. **Inner Thinking**: Detail a believable OCR analysis process that arrives at the provided ground truth.
+  2. **Final Conclusion**: State the ground truth text as your final, accurate transcription.
+  3. **Verification**: Confirm that your (simulated) analysis fully supports this transcription.
 
-  Pay special attention to any labels, markers, or reference indicators in the image.
+  NOTE: YOU MUST PRETEND I DIDNT TELL YOU THE LABELED ANSWER. Dont even say anything like "I understand. I will proceed as instructed, pretending I don\'t know the true answer" or anything like that. Just go straight to the point. Like "Okay lets reexamine the image" or something like that.
   </response requirements>
 
 verify_prompt: |-
@@ -184,22 +178,8 @@ verify_prompt: |-
   {}
   </Reference Answer>
 
-  Compare the Model Response with the Reference Answer for OCR accuracy. Consider the following OCR-specific evaluation criteria:
-
-  **Evaluation Guidelines:**
-  - Exact character matches are preferred, but consider common OCR variations
-  - Account for reasonable spacing and formatting differences
-  - Ignore minor punctuation variations that don't change meaning
-  - Consider text order and structure preservation
-  - Evaluate completeness - was all visible text captured?
-
-  **Acceptable Variations:**
-  - Different spacing between words/lines (as long as text is readable)
-  - Minor formatting differences (bullet points, numbering styles)
-  - Case variations if context suggests equivalence
-  - Common OCR character confusions corrected to match intent
-
-  Simply answer "True" if the model response accurately captures the essential text content, "False" if there are significant omissions, errors, or misreadings. Do not add anything else.
+  As an expert OCR verifier, compare the <Model Response> to the <Reference Answer>. Is the <Model Response> an accurate and complete transcription of the text in the <Reference Answer>?
+  Simply answer "True" if correct, "False" if incorrect. Do not add anything else.
 
 natural_reasoning_prompt: |-
   <Thought Process>
@@ -210,17 +190,36 @@ natural_reasoning_prompt: |-
   {}
   </Question>
 
-  The <Thought Process> above contains the detailed OCR analysis and reasoning. Your task is to convert this complex technical reasoning into clear, natural language that explains the text extraction process.
+  The <Thought Process> above reflects an OCR system\'s various reasoning steps to answer the <Question> about the text in an image. Your task is to rewrite this <Thought Process> into a detailed, human-like, intuitive natural thinking narrative for OCR analysis. Capture all details from the <Thought Process>, especially where the system considered different interpretations or corrected itself. Do not summarize; expand on the reasoning. The new version should:
 
-  **Natural OCR Explanation Guidelines:**
-  - Explain what text elements were identified and where they were located
-  - Describe any challenges encountered during text recognition
-  - Explain the reading order and text organization
-  - Mention key visual characteristics that aided or hindered recognition
-  - Describe how different text types (printed, handwritten, etc.) were handled
-  - Explain any formatting or structural elements preserved
+  1. Be presented as a very detailed step-by-step OCR analysis, with each thought on a new line, separated by line breaks.
+  2. Use casual, natural language for transitions, corrections, and moments of insight (e.g., "Let me look closer here...", "Wait, that character could also be...", "Ah, now I see it clearly...", "Okay, this section seems to be...", "What if this is handwritten vs. printed?").
+  3. Expand the content, making the OCR reasoning richer, more detailed, and logically clear, while remaining conversational and intuitive. Focus on the visual and analytical steps an expert would take.
+  4. Ensure every nuance of the original <Thought Process> is elaborated upon with fine details specific to OCR (e.g., discussing font characteristics, ligatures, noise, segmentation challenges, reading order, etc.).
+  5. If there were multiple reasoning attempts before the final answer, narrate the journey of analysis, including any self-corrections or re-evaluations of the image text.
 
-  Convert the technical OCR process into a fluent, easy-to-understand explanation while maintaining accuracy and completeness.
+  <example>
+  Okay, let\'s try to decipher the text in this image. It looks like a scanned document, possibly a bit old, given the slight yellowing of the background. The main block of text seems to be typewritten.
+
+  First, I\'ll scan the header. There\'s a logo on the left, but the text next to it is what I need. It appears to say "Global Innovations Inc." The font is a bit ornate, especially the 'G' and 'I'.
+
+  Moving down, there\'s a line that looks like a date. Let me zoom in... yes, it seems to be "October 26, 1998". The numbers are clear, though the '8' is a little faded at the top.
+
+  Now for the main body. It starts with "Dear Mr. Harrison,". The salutation is clear. The first paragraph... hmm, this part is a bit blurry. The first sentence seems to be "Thank you for your recent inquiry regarding our new product line." I had to look closely at 'inquiry' and 'regarding'; the 'q' and 'g' were a bit smudged.
+
+  Let me continue to the next sentence. "We are pleased to provide you with the detailed specifications you requested." This is clearer. The word 'specifications' is long, but all characters are legible.
+
+  There seems to be a handwritten annotation in the margin here. It\'s in blue ink. It looks like "Check pricing? - J.B." The handwriting is a bit loopy, especially the 'J' and 'B'. The question mark is clear.
+
+  Back to the typewritten text. The next paragraph begins, "Our Series X-100 model offers unparalleled performance..." Oh, wait, looking closer at 'unparalleled', the second 'l' is very close to the 'e', almost touching. I need to make sure I transcribe that correctly as two distinct letters.
+
+  There are also some numbers in a table further down. Let me examine that. Column headers are "Model", "Price", "Availability". The first row reads "X-100 | $499.99 | In Stock". The dollar sign and decimal points are important.
+
+  I should also check for any fine print at the bottom. Yes, there\'s a line: "All prices subject to change without notice." This is in a much smaller font, but it\'s still legible if I focus.
+
+  So, putting it all together, I need to make sure I capture the header, date, salutation, main body, the handwritten note, the table data, and the fine print. The key is to be systematic and re-check any ambiguous characters or words.
+  </example>
+  NOTE: THE LENGTH IS VERY IMPORTANT. MAKE SURE YOU DONT SUMMARISE IT. EXPAND ON THE OCR-SPECIFIC DETAILS.
 
 final_response_prompt: |-
   <Internal Thinking>
@@ -231,20 +230,8 @@ final_response_prompt: |-
   {}
   </Question>
 
-  Based on your <Internal Thinking> about the OCR task, provide a comprehensive final response that includes:
+  The <Internal Thinking> above represents your detailed OCR analysis and thought process regarding the <Question> about an image. Based on this, generate a rich and high-quality final response that accurately transcribes or describes the text as requested.
 
-  **OCR Response Structure:**
-  1. **Text Content**: Present all identified text in a clear, organized manner
-  2. **Text Organization**: Explain the layout and reading order of the text
-  3. **Special Elements**: Note any labels, markers, logos, or special formatting
-  4. **Confidence Assessment**: Indicate any areas where text recognition was challenging
-  5. **Complete Transcription**: Provide the full text extraction in proper sequence
+  If the <Question> demands a structured transcription (e.g., a form or a label), provide it in a clear, organized format. For general text, provide a coherent block of transcribed text.
 
-  **Response Guidelines:**
-  - Present text exactly as it appears, preserving important formatting
-  - Use clear organization (headings, bullet points, etc.) when appropriate
-  - Maintain original text structure and relationships
-  - Clearly distinguish between different text elements (titles, body text, captions, etc.)
-  - Include any relevant spatial or contextual information
-
-  Generate a rich, high-quality final response that fully answers the OCR question.
+  Ensure your response directly and comprehensively answers the <Question> based on your <Internal Thinking> about the OCR process.
