@@ -1,12 +1,17 @@
 import logging
 import os
 from datetime import datetime
+from pathlib import Path
 
 def setup_logger(name='moremi_reasoning'):
     """Set up logging with timestamp and proper directory structure"""
+    # Get the project root (src is where this utils folder lives)
+    project_root = Path(__file__).parent.parent
+    logs_dir = project_root / 'logs'
+    logs_dir.mkdir(exist_ok=True)
+    
     timestamp = datetime.now().strftime('%Y-%m-%d_%Hh%Mm%Ss')
-    log_filename = os.path.join('moremi_reasoning/logs', f'{name}_{timestamp}.log')
-    os.makedirs('moremi_reasoning/logs', exist_ok=True)
+    log_filename = logs_dir / f'{name}_{timestamp}.log'
     
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
