@@ -15,3 +15,8 @@ minoenv/*
 mcp_servers/*
 minoenv/bin/activate
 setup_mcp_servers.sh
+backup/
+mcp_servers/
+*.sh
+.github/chatmodes/Expo.chatmode.md
+*.progress
