@@ -95,15 +95,19 @@ def process_sample_ocr(
         initial_model_response = gpt_instance.call(
             content=initial_prompt_content,
             image_urls=[str(image_path)], 
-            additional_args={"max_tokens": prompts.get("max_tokens", 1500)} 
+            additional_args={"max_tokens": prompts.get("max_tokens", 20000)} 
         )
         response_history.append(initial_model_response)
 
-        # 4. Apply reasoning strategies
+        # 4. Apply reasoning strategies with comprehensive verification
         context_data = {
             "image_urls": [str(image_path)],
             "question": generated_question, # The core question asked
-            "current_response": initial_model_response 
+            "current_response": initial_model_response,
+            "ground_truth": ground_truth_transcription,  # Use ground truth for verification
+            "query_history": query_history,
+            "response_history": response_history,
+            "content_type": "ocr"  # For handwriting OCR content
         }
         
         strategy_result = reasoning_strategies.apply_all_strategies(
@@ -113,11 +117,16 @@ def process_sample_ocr(
         )
         
         final_answer_text = strategy_result["final_result"]
+        found_correct_answer = strategy_result.get("found_correct_answer", False)
         query_history.extend([f"Applied strategy: {s}" for s in strategy_result["strategies_used"]])
         # Assuming strategy_result["reasoning_trace"] contains only the steps taken by the strategies,
         # not the initial_model_response that was passed to them.
         # initial_model_response is already in response_history.
         response_history.extend(strategy_result["reasoning_trace"])
+        
+        # Update query/response history from strategy results
+        query_history.extend(strategy_result.get("query_history", []))
+        response_history.extend(strategy_result.get("response_history", []))
 
         # 5. Synthesize Natural Reasoning (New Step)
         natural_reasoning_text = synthesize_natural_reasoning(
@@ -137,7 +146,7 @@ def process_sample_ocr(
         
         final_response = gpt_instance.text_only_call(
             content=final_response_query,
-            additional_args={"max_tokens": prompts.get("final_response_max_tokens", 1000)}
+            additional_args={"max_tokens": prompts.get("final_response_max_tokens", 20000)}
         )
         response_history.append(final_response)
 
@@ -145,8 +154,7 @@ def process_sample_ocr(
         # The final_response should be the most refined version, similar to multimodal_simply.py
         extracted_answer = extract_final_conclusion(final_response, content_type="ocr") 
 
-        # Note: 'Correct' field like in multimodal_QRA_pair.py is omitted 
-        # because ground_truth_answer for a generated question is not available from XML.
+        # Note: Ground truth verification is now performed during strategy application
         return {
             "process_id": process_id, # Added for consistency
             "image_id": image_id,
@@ -157,6 +165,7 @@ def process_sample_ocr(
             "Complex_CoT": natural_reasoning_text, # Store the natural reasoning summary here
             "Response": final_response, # Final response from the model (matching multimodal_simply.py)
             "Extracted_Answer": extracted_answer, # Add extracted answer as separate field
+            "Found_Correct_Answer": found_correct_answer,  # Track verification result
             "Query_History": query_history,
             "Response_History": response_history, # Detailed list of model responses/reasoning steps
             "Strategies_Used": strategy_result["strategies_used"],
