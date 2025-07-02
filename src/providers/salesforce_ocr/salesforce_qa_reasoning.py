@@ -18,7 +18,8 @@ from src.core.reasoning_engine import (
     MultimodalGPT,
     ReasoningStrategies,
     extract_final_conclusion,
-    synthesize_natural_reasoning
+    synthesize_natural_reasoning,
+    
 )
 from src.providers.i_am_handwriting.iam_utils import (
     ProgressTracker, 
@@ -86,16 +87,19 @@ def process_salesforce_qa_pair(
         initial_model_response = gpt_instance.call(
             content=initial_prompt_content,
             image_urls=[str(image_path)], 
-            additional_args={"max_tokens": prompts.get("max_tokens", 1500)} 
+            additional_args={"max_tokens": prompts.get("max_tokens", 20000)} 
         )
         response_history.append(initial_model_response)
 
-        # 3. Apply reasoning strategies
+        # 3. Apply reasoning strategies with comprehensive verification
         context_data = {
             "image_urls": [str(image_path)],
             "question": question,
             "current_response": initial_model_response,
-            "ground_truth": ground_truth_answer  # Available for reference
+            "ground_truth": ground_truth_answer,  # Used for verification
+            "query_history": query_history,
+            "response_history": response_history,
+            "content_type": "ocr"  # For salesforce OCR content
         }
         
         strategy_result = reasoning_strategies.apply_all_strategies(
@@ -105,8 +109,13 @@ def process_salesforce_qa_pair(
         )
         
         final_answer_text = strategy_result["final_result"]
+        found_correct_answer = strategy_result.get("found_correct_answer", False)
         query_history.extend([f"Applied strategy: {s}" for s in strategy_result["strategies_used"]])
         response_history.extend(strategy_result["reasoning_trace"])
+        
+        # Update query/response history from strategy results
+        query_history.extend(strategy_result.get("query_history", []))
+        response_history.extend(strategy_result.get("response_history", []))
 
         # 4. Synthesize Natural Reasoning
         natural_reasoning_text = synthesize_natural_reasoning(
@@ -125,7 +134,7 @@ def process_salesforce_qa_pair(
         
         final_response = gpt_instance.text_only_call(
             content=final_response_query,
-            additional_args={"max_tokens": prompts.get("final_response_max_tokens", 1000)}
+            additional_args={"max_tokens": prompts.get("final_response_max_tokens", 20000)}
         )
         response_history.append(final_response)
 
@@ -140,6 +149,7 @@ def process_salesforce_qa_pair(
             "Complex_CoT": natural_reasoning_text,
             "Response": final_response,
             "Extracted_Answer": extracted_answer,
+            "Found_Correct_Answer": found_correct_answer,  # Track verification result
             "Query_History": query_history,
             "Response_History": response_history,
             "Strategies_Used": strategy_result["strategies_used"],

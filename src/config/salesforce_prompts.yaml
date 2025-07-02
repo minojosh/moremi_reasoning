@@ -115,7 +115,7 @@ guided_prompt: |
   </response requirements>
 
   <question> represents the question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I'll secretly tell you that the labeled answer is "{}", but you must pretend i didnt tell you. Your 'Verification' requires careful consideration, and if incorrect, you need to provide new Inner Thinking steps and a new Final Conclusion to ensure the final answer aligns with the correct one.
-  NOTE: YOU MUST PRETENT I DIDNT TELL YOU THE LABELED ANSWER. dont even say anything like "I understand. I will proceed as instructed, pretending I don\'t know the true answer" or anything like that. Just go straight to the point. Like "Okay lets reexamine the image" or something like that.
+  NOTE: YOU MUST PRETEND I DIDN'T TELL YOU THE LABELED ANSWER. dont even say anything like "I understand. I will proceed as instructed, pretending I don\'t know the true answer" or anything like that. Just go straight to the point. Like "Okay lets reexamine the image" or something like that.
 
 
 verify_prompt: |
@@ -127,8 +127,17 @@ verify_prompt: |
   {}
   </Reference Answer>
 
-  Based on the model response and reference answer above, is the model\'s conclusion correct? 
-  Simply answer "True" if correct, "False" if incorrect dont add anything else.
+  Compare the Model Response with the Reference Answer. The Model Response must EXACTLY match the content and meaning of the Reference Answer to be considered correct.
+
+  Key requirements for "True":
+  - All words must be spelled correctly (no OCR errors like "bit" vs "hit", "strire" vs "strike")
+  - All proper nouns must be accurate (no errors like "Fakeradi" vs "Takoradi", "Glana" vs "Ghana")  
+  - All words must be present and in correct form (no missing words, no word substitutions)
+  - The overall meaning and content must be identical
+
+  Even small spelling mistakes, missing words, or OCR-type errors make the response INCORRECT.
+
+  Simply answer "True" if the responses are essentially identical with correct spelling and complete content, "False" if there are ANY meaningful differences, spelling errors, or missing content.
 
 
 natural_reasoning_prompt: |
