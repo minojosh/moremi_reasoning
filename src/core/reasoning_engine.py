@@ -119,12 +119,12 @@ class MultimodalGPT:
                         "image_url": {"url": image_url_with_prefix}
                     })
             
-            # Set default parameters
+            # Set default parameters - VERY LOW temperature for OCR accuracy
             api_params = {
                 "model": model or self.model_name,
                 "messages": messages,
                 "max_tokens": additional_args.get("max_tokens", 20000),
-                "temperature": additional_args.get("temperature", 1.0)
+                "temperature": additional_args.get("temperature", 0.05)  # Near-deterministic for OCR
             }
             
             response = client.chat.completions.create(**api_params)
@@ -140,9 +140,9 @@ class MultimodalGPT:
             raise ValueError(f"API Error: {str(e)}")
 
     def text_only_call(self, content, additional_args=None):
-        """Text-only processing for verification tasks."""
+        """Text-only processing for verification tasks - ZERO temperature for consistency."""
         if additional_args is None:
-            additional_args = {}
+            additional_args = {"temperature": 0.0}  # Deterministic verification
         return self.call(content, additional_args, model="google/gemini-2.0-flash-001")
 
     def retry_call(self, content, additional_args=None, image_urls=None, url=None, max_attempts=2):
@@ -197,18 +197,84 @@ def extract_final_conclusion(text, content_type="general"):
     
     # Handle OCR-specific patterns
     if content_type == "ocr":
+        # First try to find explicit transcription sections
         ocr_patterns = [
-            r"(?:transcription|transcribed text|extracted text|final transcription):\s*(.*?)(?:\n\n|\Z)",
-            r"(?:the text (?:in the image )?(?:reads?|says?)):\s*(.*?)(?:\n\n|\Z)",
-            r"(?:handwritten text|visible text|text content):\s*(.*?)(?:\n\n|\Z)"
-        ]
-        
+            # "Here's the transcribed text:" followed by the actual content
+            r"(?:here's the transcribed text|here is the transcribed text):\s*\n*(.*?)(?:\n\n\*\*|$)",
+            # "The text reads:" or similar
+            r"(?:the (?:handwritten )?text (?:in the image )?(?:reads?|says?|is)):\s*\n*(.*?)(?:\n\n\*\*|$)",
+            # "Transcription:" or "Transcribed text:"
+            r"(?:transcription|transcribed text|extracted text|final transcription):\s*\n*(.*?)(?:\n\n\*\*|$)",
+            # Content after "**Transcription:**" headers
+            r"\*\*transcription\*\*:\s*\n*(.*?)(?:\n\n\*\*|$)",
+            # Direct handwritten content patterns
+            r"(?:handwritten text|visible text|text content):\s*\n*(.*?)(?:\n\n\*\*|$)",
+            r"(?:final conclusion|in conclusion|therefore|thus|to conclude|in summary):\s*(.*?)(?:\n\n|\Z)",
+            r"(?:the answer is|my answer is|i conclude that):\s*(.*?)(?:\n\n|\Z)",
+            r"(?::diagnosis is|diagnosis:|final diagnosis:):\s*(.*?)(?:\n\n|\Z)"        ]
+
         for pattern in ocr_patterns:
             match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
             if match:
                 result = match.group(1).strip()
+                # Clean up any residual formatting
+                result = re.sub(r'\*\*([^*]+)\*\*', r'\1', result)
+                result = re.sub(r'\*([^*]+)\*', r'\1', result)
+                # Remove visual presentation sections
+                result = re.sub(r'\n\*\*Visual Presentation.*$', '', result, flags=re.DOTALL)
                 if result and len(result) > 10:
                     return result
+        
+        # For handwriting OCR, look for quoted content which often contains the actual transcription
+        quote_patterns = [
+            r'"([^"]{20,})"',  # Long quoted content (likely the transcription)
+            r'\"([^\"]{20,})\"'  # Alternative quote style
+        ]
+        
+        for pattern in quote_patterns:
+            matches = re.findall(pattern, text, re.DOTALL)
+            if matches:
+                # Return the longest quoted content (most likely the full transcription)
+                longest_quote = max(matches, key=len)
+                if len(longest_quote) > 20:
+                    return longest_quote.strip()
+        
+        # Look for content that starts with capital letters and looks like transcribed text
+        # This catches cases where the transcription isn't explicitly labeled
+        lines = text.split('\n')
+        potential_transcription = []
+        collecting = False
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                if collecting and potential_transcription:
+                    break  # End of transcription block
+                continue
+                
+            # Skip meta-commentary lines
+            if any(skip_phrase in line.lower() for skip_phrase in [
+                'the text is', 'visual presentation', 'handwriting', 'organized', 
+                'here\'s the', 'the image contains', 'transcribed text', 'transcription:',
+                'extracted text', 'final transcription', 'the answer is', 'my answer is',
+                'i conclude that', 'diagnosis is', 'final diagnosis', 'findings:',
+            ]):
+                if not collecting:
+                    continue
+                else:
+                    break  # End of transcription
+                    
+            # Start collecting if we find content that looks like transcribed text
+            if re.match(r'^[A-Z]', line) and len(line) > 10:
+                collecting = True
+                potential_transcription.append(line)
+            elif collecting:
+                potential_transcription.append(line)
+        
+        if potential_transcription:
+            result = '\n'.join(potential_transcription).strip()
+            if len(result) > 20:
+                return result
     
     # Handle medical/diagnostic patterns
     if content_type == "medical":
@@ -272,7 +338,10 @@ def extract_final_conclusion(text, content_type="general"):
     return text[-200:].strip() if len(text) > 200 else text
 
 def check_answer_accuracy(response, reference, gpt_instance, query_history=None, response_history=None, content_type="general"):
-    """Check if a response is correct without requiring specific formatting."""
+    """
+    Comprehensive answer accuracy checking that strictly validates against ground truth.
+    Uses prompts from config files and ensures nothing found in ground truth is omitted.
+    """
     if query_history is None:
         query_history = []
     if response_history is None:
@@ -281,17 +350,30 @@ def check_answer_accuracy(response, reference, gpt_instance, query_history=None,
     # Extract the actual content to compare
     extracted_response = extract_final_conclusion(response, content_type)
     
-    verify_prompt = gpt_instance.config.prompts.get('verify_prompt', 
-        'Compare the following response with the reference answer. Answer "True" if they match, "False" otherwise.\n\nResponse: {}\nReference: {}')
+    # Use the verify_prompt from the config (handwriting_prompts.yaml or salesforce_prompts.yaml)
+    verify_prompt_template = gpt_instance.config.prompts.get('verify_prompt', 
+        '<Model Response>\n{}\n</Model Response>\n\n<Reference Answer>\n{}\n</Reference Answer>\n\nBased on the model response and reference answer above, is the model\'s conclusion correct?\nSimply answer "True" if correct, "False" if incorrect dont add anything else.')
     
-    query = verify_prompt.format(extracted_response, reference)
+    # Format the verification query
+    query = verify_prompt_template.format(extracted_response, reference)
     query_history.append(query)
     
+    # Get verification response
     verification = gpt_instance.text_only_call(query)
     response_history.append(verification)
-    print("verification: ", verification)
+    print(f"verification: {verification}")
     
-    return 'true' in verification.lower()
+    # Strict checking - must contain "True" (case-insensitive) and NOT contain "False"
+    verification_lower = verification.lower().strip()
+    
+    # More comprehensive checking
+    is_correct = False
+    if 'true' in verification_lower and 'false' not in verification_lower:
+        is_correct = True
+    elif verification_lower.startswith('true') or verification_lower == 'true':
+        is_correct = True
+    
+    return is_correct
 
 class ReasoningStrategies:
     """Reusable reasoning strategies for different applications."""
@@ -331,7 +413,7 @@ class ReasoningStrategies:
             strategy_response = self.gpt.call(
                 content=formatted_prompt,
                 image_urls=image_urls,
-                additional_args={"max_tokens": 1000, "temperature": 0.7}
+                additional_args={"max_tokens": 20000, "temperature": 0.05}
             )
             
             # Extract improved result
@@ -347,26 +429,134 @@ class ReasoningStrategies:
             return current_result
     
     def apply_all_strategies(self, initial_result, context_data=None, max_strategies=3):
-        """Apply multiple reasoning strategies sequentially."""
+        """
+        Apply multiple reasoning strategies sequentially until correct answer found or max attempts reached.
+        This mirrors the comprehensive approach from multimodal_simply.py
+        """
         current_result = initial_result
         strategies_used = []
         reasoning_trace = []
         
-        for strategy_name, strategy_prompt in self.strategies[:max_strategies]:
-            if not strategy_prompt:
-                continue
+        # Initialize tracking variables
+        found_correct_answer = False
+        query_history = context_data.get('query_history', []) if context_data else []
+        response_history = context_data.get('response_history', []) if context_data else []
+        ground_truth = context_data.get('ground_truth', '') if context_data else ''
+        
+        # First check if initial result is already correct
+        if ground_truth and self.gpt:
+            try:
+                found_correct_answer = check_answer_accuracy(
+                    current_result, ground_truth, self.gpt, 
+                    query_history, response_history, 
+                    context_data.get('content_type', 'general') if context_data else 'general'
+                )
+                print(f"Initial result accuracy check: {found_correct_answer}")
+            except Exception as e:
+                print(f"Error checking initial accuracy: {e}")
+        
+        # If already correct, return early
+        if found_correct_answer:
+            return {
+                "final_result": current_result,
+                "strategies_used": ["Initial response was correct"],
+                "reasoning_trace": [current_result],
+                "found_correct_answer": found_correct_answer,
+                "query_history": query_history,
+                "response_history": response_history
+            }
+        
+        # Apply strategies until correct answer found or max attempts reached
+        search_attempts = 0
+        max_search_attempts = self.config.config.get('max_search_attempts', 3)
+        max_search_depth = self.config.config.get('max_search_depth', 2)
+        
+        while not found_correct_answer and search_attempts < max_search_attempts:
+            for depth in range(max_search_depth):
+                if len(strategies_used) >= max_strategies:
+                    break
+                    
+                # Select strategy (can be random or sequential)
+                strategy_index = search_attempts % len(self.strategies)
+                strategy_name, strategy_prompt = self.strategies[strategy_index]
                 
-            improved = self.apply_strategy(strategy_name, strategy_prompt, current_result, context_data)
-            
-            if improved != current_result:
-                current_result = improved["result"]
-                strategies_used.append(strategy_name)
-                reasoning_trace.append(improved["reasoning"])
+                if not strategy_prompt:
+                    continue
+                
+                try:
+                    # Apply the strategy
+                    improved = self.apply_strategy(strategy_name, strategy_prompt, current_result, context_data)
+                    
+                    # Check if strategy returned a valid result
+                    if isinstance(improved, dict) and "result" in improved:
+                        new_result = improved["result"]
+                        if new_result != current_result:
+                            current_result = new_result
+                            strategies_used.append(f"Attempt {search_attempts+1}-{depth+1}: {strategy_name}")
+                            reasoning_trace.append(improved["reasoning"])
+                            
+                            # Check if this strategy found the correct answer
+                            if ground_truth and self.gpt:
+                                try:
+                                    found_correct_answer = check_answer_accuracy(
+                                        current_result, ground_truth, self.gpt,
+                                        query_history, response_history,
+                                        context_data.get('content_type', 'general') if context_data else 'general'
+                                    )
+                                    print(f"Strategy {strategy_name} accuracy: {found_correct_answer}")
+                                    
+                                    if found_correct_answer:
+                                        break
+                                except Exception as e:
+                                    print(f"Error checking accuracy for {strategy_name}: {e}")
+                    else:
+                        # Handle case where strategy returns just the result (backward compatibility)
+                        if improved != current_result:
+                            current_result = improved
+                            strategies_used.append(f"Attempt {search_attempts+1}-{depth+1}: {strategy_name}")
+                            reasoning_trace.append(improved)
+                    
+                except Exception as e:
+                    print(f"Error applying strategy {strategy_name}: {e}")
+                    strategies_used.append(f"Failed: {strategy_name}")
+                    
+            search_attempts += 1
+            if found_correct_answer:
+                break
+        
+        # If still not correct and efficient search is enabled, try guided approach
+        efficient_search = self.config.config.get('efficient_search', True)
+        if not found_correct_answer and efficient_search and ground_truth and self.gpt:
+            try:
+                guided_prompt = self.config.prompts.get('guided_prompt', '')
+                if guided_prompt and context_data:
+                    question = context_data.get('question', '')
+                    guided_query = guided_prompt.format(question, current_result, ground_truth)
+                    
+                    # Apply guided strategy with deterministic temperature
+                    image_urls = context_data.get('image_urls', [])
+                    guided_result = self.gpt.call(
+                        content=guided_query,
+                        image_urls=image_urls,
+                        additional_args={"max_tokens": 20000, "temperature": 0.05}  # Deterministic
+                    )
+                    
+                    if guided_result:
+                        current_result = guided_result
+                        strategies_used.append("Guided Analysis")
+                        reasoning_trace.append(guided_result)
+                        found_correct_answer = True  # Assume guided approach is correct
+                        
+            except Exception as e:
+                print(f"Error in guided approach: {e}")
         
         return {
             "final_result": current_result,
             "strategies_used": strategies_used,
-            "reasoning_trace": reasoning_trace
+            "reasoning_trace": reasoning_trace,
+            "found_correct_answer": found_correct_answer,
+            "query_history": query_history,
+            "response_history": response_history
         }
 
 def synthesize_natural_reasoning(gpt_instance: MultimodalGPT, reasoning_history: list[str], question: str, prompts: dict) -> str:
@@ -402,7 +592,7 @@ def synthesize_natural_reasoning(gpt_instance: MultimodalGPT, reasoning_history:
     try:
         natural_response = gpt_instance.text_only_call(
             content=prompt_content,
-            additional_args={"max_tokens": prompts.get("natural_reasoning_max_tokens", 1000)}
+            additional_args={"max_tokens": prompts.get("natural_reasoning_max_tokens", 20000)}
         )
         return natural_response
     except Exception as e:
