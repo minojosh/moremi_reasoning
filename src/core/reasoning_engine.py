@@ -74,8 +74,13 @@ class MultimodalGPT:
     
     def __init__(self, config: ReasoningConfig):
         self.config = config
-        self.model_name = config.config["model_name"]
-        self.api_url = config.config["api_url"]
+        # Support top-level or nested 'reasoning' config section
+        model_conf = config.config.get('reasoning', config.config)
+        try:
+            self.model_name = model_conf['model_name']
+            self.api_url = model_conf.get('api_url', model_conf.get('api_url'))
+        except KeyError:
+            raise KeyError("'model_name' must be defined in configuration under 'model_name' or 'reasoning.model_name'")
         self.api_key = os.getenv("OPEN_ROUTER_API_KEY")
         
         if not self.api_key:
