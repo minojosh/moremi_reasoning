@@ -1,0 +1,251 @@
+query_prompt_init: |
+  <question>
+  {}
+  </question>
+
+  Please respond to the above question <question> with the attached medical images using the Chain of Thought (CoT) reasoning method by analyzing the case with the images. You should examine all provided images carefully. You should read from the values image if any eg. if they have labels in the image, like Image A or Image B or anything, mention them in your thought. If there are multiple images, treat them as a series and analyze how they relate to each other. Your response should consist of multiple steps, each of which includes three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  - **'Inner Thinking'**: This is the step where thinking is done. Note that multiple 'Inner Thinking' steps are required to describe thorough reasoning about the medical findings. Each step should first generate a brief title.
+  - **'Final Conclusion'**: At this stage, you summarize the correct reasoning from previous 'Inner Thinking' steps and provide the final medical assessment. No title is required here.
+  - **'Verification'**: At this stage, you verify the conclusion from the "Final Conclusion" step. If the conclusion holds, end the process. If not, return to "Inner Thinking" for further reasoning. No title is required here.
+  Your response should be detailed and thorough, showing all your diagnostic thinking process.
+
+
+gen_prompt_rethink_Backtracking: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final medical assessment. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the medical question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Read question well and take good note of the medical images provided. All your reasoning should match the medical images. If there are labels or anatomical markers showing eg A or B or anything, mention them in your thought. Your 'Verification' results must align with mine. Proceed to refine the reasoning using **backtracking** to revisit earlier points of medical assessment and construct a new Final Conclusion.
+
+
+gen_prompt_rethink_Exploring_New_Path: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final medical assessment. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the medical question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Your 'Verification' results must align with mine. Read question well and take good note of the medical images provided. All your reasoning should match the medical images. If there are labels or anatomical markers showing eg A or B or anything, mention them in your thought. Proceed to refine the reasoning by exploring new approaches to solving this medical problem and construct a new Final Conclusion.
+
+
+gen_prompt_rethink_Verification: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final medical assessment. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the medical question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Read question well and take good note of the medical images provided. All your reasoning should match the medical images. If there are labels or anatomical markers showing eg A or B or anything, mention them in your thought. Your 'Verification' results must align with mine. Proceed to refine the reasoning by conducting a thorough **verification** process to ensure validity and construct a new Final Conclusion.
+
+
+gen_prompt_rethink_Correction: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final medical assessment. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the medical question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I have manually reviewed the reasoning and determined that the **Final Conclusion** is false. Read question well and take good note of the medical images provided. All your reasoning should match the medical images. If there are labels or anatomical markers showing eg A or B or anything, mention them in your thought. Your 'Verification' results must align with mine. Proceed to refine the reasoning by making precise **corrections** to address prior flaws in medical assessment and construct a new Final Conclusion.
+
+
+# Prompt to provide the correct answer (when all else fails)
+guided_prompt: |
+  <question>
+  {}
+  </question>
+
+  <previous reasoning>
+  {}
+  </previous reasoning>
+
+  <response requirements>
+  Your response must include the following steps, each composed of three types of actions: **"Inner Thinking"**, **"Final Conclusion"**, and **"Verification"**:
+
+  1. **Inner Thinking**: Break down the reasoning process into multiple concise steps. Each step should start with a brief title to clarify its purpose.
+  2. **Final Conclusion**: Summarize the correct reasoning from all previous 'Inner Thinking' steps and provide the final medical assessment. No title is needed for this section.
+  3. **Verification**: Verify the accuracy of the "Final Conclusion". If it holds, conclude the process. Otherwise, return to "Inner Thinking" for further refinement.
+
+  </response requirements>
+
+  <question> represents the medical question to be answered, and <previous reasoning> contains your prior reasoning. Your task is to continue from the current 'Verification' step. I'll secretly tell you that the correct medical assessment should focus on "{}", but you must pretend i didnt tell you. Your 'Verification' requires careful consideration, and if incorrect, you need to provide new Inner Thinking steps and a new Final Conclusion to ensure the final assessment aligns with proper medical interpretation.
+
+  NOTE: YOU MUST PRETEND I DIDN'T TELL YOU THE GUIDED INFORMATION. dont even say anything like "I understand. I will proceed as instructed, pretending I don't know the true answer" or anything like that. Just go straight to the point. Like "Okay lets reexamine the medical images" or something like that.
+
+
+verify_prompt: |
+  <Model Response>
+  {}
+  </Model Response>
+
+  <Reference Answer>
+  {}
+  </Reference Answer>
+
+  Compare the Model Response with the Reference Answer. The Model Response must EXACTLY match the content and meaning of the Reference Answer.
+
+  Answer "True" if they match fully, otherwise "False".
+  
+verify_multi_prompt: |
+  <Model Response>
+  Text Report:
+  {text_report}
+
+  JSON Report:
+  {json_report}
+  </Model Response>
+
+  <Reference Answer>
+  {ground_truth_text}
+  </Reference Answer>
+
+  Compare the Model Response with the Reference Answer in three steps:
+  1. Text vs. Ground Truth: assess clinical accuracy and completeness of the text report.
+  2. JSON vs. Ground Truth: verify the structured JSON captures all key findings from the reference text.
+  3. Text vs. JSON: ensure consistency between the text and structured reports.
+
+  Return a JSON object exactly matching this schema:
+  {
+    "text_report_accurate": boolean,
+    "json_report_accurate": boolean,
+    "reports_consistent": boolean,
+    "discrepancies": string
+  }
+
+  - Use true/false for boolean values.
+  - "discrepancies" should describe any mismatches or be "None".
+
+
+natural_reasoning_prompt: |
+  <Thought Process>
+  {}
+  </Thought Process>
+
+  <Question>
+  {}
+  </Question>
+
+  The <Thought Process> above reflects the model's different medical reasoning steps based on the <Question>. Your task is to rewrite the <Thought Process> to resemble a more detailed and human-like, intuitive medical thinking process. As you can see in the <Thought Process> there were many steps of medical reasoning. Where the model may consider different diagnostic paths. Make sure you capture all the details and dont summarize them. Make sure you detail them they should be as long as possible. Dont summarise it. Make sure you take everything in the thought process given to you. The new version should:
+
+  1. Be presented as very detailed step-by-step medical reasoning, with each detailed thought on a new line separated by a line break.
+  2. Avoid structured titles or formatting, focusing on natural transitions. Use casual and natural language for transitions or validations, such as "but wait", "hmm," "oh," "also," "what if", "wait." etc (there are so many ways to flow).  
+  3. Expand the content, making the reasoning richer, more detailed, and logically clear while still being conversational and intuitive.
+  4. Make sure medical thought process is taken into very fine details.  
+  5. If there were many reasoning steps before the final assessment, dont just jump straight to mentioning it. Bring the reasoning before mentioning it.
+
+  Below is an example of reasoning trace for medical image interpretation:
+  <example>
+  Okay, let me examine this medical image systematically. First, I need to get oriented to what I'm looking at. This appears to be a chest X-ray, so I should follow a systematic approach to reviewing it.
+
+  Let me start with the technical quality. The image appears adequately penetrated, and I can see the spine through the cardiac silhouette, which is good. The patient appears to be in good inspiration based on the rib count I can see.
+
+  Now, let me go through this systematically. I'll start with the airways. Looking at the trachea, it appears midline, which is good. I can trace it down toward the carina. The main bronchi look symmetrical from what I can see.
+
+  Moving to the lungs, let me examine each lung field carefully. Starting with the right lung, I'm looking at the upper, middle, and lower zones. The lung markings appear... hmm, let me look more carefully. In the right upper zone, the vasculature looks normal. The right middle zone also appears clear. But wait, when I look at the right lower zone, something catches my eye.
+
+  There seems to be some increased opacity in the right lower lobe. It's not a complete whiteout, but there's definitely some consolidation there. The margins are somewhat fluffy, which could suggest pneumonia or another inflammatory process.
+
+  Now let me check the left lung. The left upper zone looks clear with normal vascular markings. The left lower zone also appears normal. So this seems to be isolated to the right lower lobe.
+
+  Let me examine the heart and mediastinum. The cardiac silhouette appears normal in size. The heart borders are well-defined, which is reassuring. The mediastinum doesn't appear widened.
+
+  Looking at the pleural spaces, I don't see any obvious pleural effusions. The costophrenic angles appear sharp bilaterally.
+
+  For the bony structures, I can see the ribs, and they appear intact. No obvious fractures. The shoulder girdles look symmetric.
+
+  Going back to that opacity in the right lower lobe, let me think about what this could represent. Given the appearance, this could be pneumonia, especially community-acquired pneumonia affecting the right lower lobe. The pattern and location are consistent with this.
+
+  But I should also consider other possibilities. Could this be atelectasis? The volume loss isn't prominent, so pneumonia seems more likely than collapse. Could it be a mass? The margins are too fluffy and indistinct for a typical mass lesion.
+
+  Actually, let me also check if there are any air bronchograms within this opacity. Yes, I think I can see some air-filled bronchi within the consolidation, which would support an infectious or inflammatory process rather than a mass.
+
+  So putting this all together, I'm seeing a right lower lobe consolidation with what appears to be air bronchograms, in the setting of an otherwise normal chest X-ray. This is most consistent with pneumonia affecting the right lower lobe.
+  </example>
+
+  NOTE: THE LENGTH IS VERY IMPORTANT. MAKE SURE YOU DONT SUMMARISE IT.
+
+
+final_report_prompt: |
+  <Internal Thinking>
+  {}
+  </Internal Thinking>
+
+  <Question>
+  {}
+  </Question>
+
+  Based on the <Internal Thinking> and the <Question>, generate a final response.
+  First, provide a concise, descriptive text summary of the findings.
+  Then, below the summary, provide a structured JSON report based on the findings.
+
+  Example:
+  The findings from the images show... A follow-up is recommended.
+
+  A report on the findings based on the structure from the question asked.
+
+final_response_prompt: |
+  <Internal Thinking>
+  {}
+  </Internal Thinking>
+
+  <Question>
+  {}
+  </Question>
+
+  The <Internal Thinking> represents your internal thoughts about the medical <Question>. Based on this, generate a rich and high-quality final response to the user. Provide only the answer to the question. The response should be clear, concise, and directly address the medical question without unnecessary elaboration or additional context.
+
+  If the <Question> demands a medical report, provide it following the appropriate modality-specific structure from the reports prompts configuration. Use proper medical terminology and ensure the report follows standard radiology reporting guidelines.
+
+  The response should be professional and suitable for clinical use.
+
+# Configuration values
+max_tokens: 20000
+final_response_max_tokens: 20000
+max_search_attempts: 3
+efficient_search: true
