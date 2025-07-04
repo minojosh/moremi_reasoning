@@ -1,0 +1,71 @@
+# Radiopedia Pipeline Configuration
+
+# Default settings
+default:
+  limit: 50
+  max_workers: 4
+  timeout: 20  # Reduced timeout for faster testing with retry logic
+  delay_between_requests: 3  # Increased to be more respectful
+  page_load_timeout: 15  # Reduced page load timeout
+  retry_attempts: 3
+
+# Scraping configuration
+scraping:
+  base_url: "https://radiopaedia.org/search"
+  search_scope: "cases"
+  headers:
+    User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+    Accept-Language: "en-US,en;q=0.5"
+
+# Selenium configuration
+selenium:
+  chrome_options:
+    - "--headless"  # Run in headless mode for better stability
+    - "--disable-gpu"
+    - "--no-sandbox"
+    - "--disable-dev-shm-usage"
+    - "--disable-extensions"
+    - "--disable-browser-side-navigation"
+    - "--disable-infobars"
+    - "--disable-notifications"
+    - "--disable-popup-blocking"
+    - "--ignore-certificate-errors"
+    - "--ignore-ssl-errors"
+    - "--allow-insecure-localhost"
+    - "--disable-web-security"
+    - "--disable-features=VizDisplayCompositor"
+    - "--window-size=1920,1080"
+    - "--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+
+# Output file naming and organization
+output:
+  url_file_suffix: "_case_urls.json"
+  cases_file_suffix: "_cases_collected.json"
+  restructured_suffix: "_cases_restructured.json"
+  filtered_suffix: "_only_cases.json"
+  failed_suffix: "_failed_cases.json"
+  # Directory structure within each run
+  directories:
+    scraped_urls: "01_scraped_urls"
+    scraped_cases: "02_scraped_cases" 
+    restructured_data: "03_restructured_data"
+    processed_data: "04_processed_data"
+
+# Reasoning Configuration (legacy)
+reasoning:
+  model_name: "google/gemini-2.5-flash"
+  api_url: "https://openrouter.ai/api/v1"
+  api_key_env: "OPENROUTER_API_KEY"
+  max_tokens: 20000
+  temperature: 0.2
+  results_dir: "src/data/radiopedia/reasoning_samples"
+  num_processes: 4
+  limit_num: null
+  max_search_attempts: 3
+  efficient_search: true
+  backup_enabled: true
+  incremental_save: true
+  max_images_per_case: 15
+  structured_reports: true
+  use_modality_templates: true
