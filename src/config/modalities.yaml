@@ -2,9 +2,7 @@ modalities:
   mammography:
     keywords:
       - mammography
-      - mammogram
-      - digital mammography
-      - screening mammography
+      - bo
   x-ray:
     keywords:
       - chest x-ray
