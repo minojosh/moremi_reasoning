@@ -8,10 +8,13 @@ def setup_logger(name='moremi_reasoning'):
     # Get the project root (src is where this utils folder lives)
     project_root = Path(__file__).parent.parent
     logs_dir = project_root / 'logs'
-    logs_dir.mkdir(exist_ok=True)
+    
+    # Create process-specific subdirectory
+    process_logs_dir = logs_dir / name
+    process_logs_dir.mkdir(parents=True, exist_ok=True)
     
     timestamp = datetime.now().strftime('%Y-%m-%d_%Hh%Mm%Ss')
-    log_filename = logs_dir / f'{name}_{timestamp}.log'
+    log_filename = process_logs_dir / f'{name}_{timestamp}.log'
     
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
